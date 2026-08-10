@@ -1,0 +1,72 @@
+{% extends 'prediction/base.html' %}
+{% block title %}History - ParkinsonAI{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div>
+        <h1>Prediction History</h1>
+        <p>Review past predictions, confidence scores, and overall usage statistics from the ParkinsonAI system.</p>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <strong>{{ total_predictions }}</strong>
+        <span>Total predictions</span>
+    </div>
+    <div class="stat-card">
+        <strong>{{ parkinson_predictions }}</strong>
+        <span>Parkinson's predicted</span>
+    </div>
+    <div class="stat-card">
+        <strong>{{ non_parkinson_predictions }}</strong>
+        <span>Non-Parkinson's predicted</span>
+    </div>
+</div>
+
+<div class="section-title" style="margin-top: 1.5rem;">
+    <h2>Recent prediction records</h2>
+    <a class="button-secondary" href="{% url 'predict' %}">New Prediction</a>
+</div>
+
+<div class="card table-card">
+    <div class="table-wrapper">
+        <table class="table-panel">
+            <thead>
+                <tr>
+                    <th>Entry Name</th>
+                    <th>Result</th>
+                    <th>Probability</th>
+                    <th>Date / time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if predictions %}
+                    {% for item in predictions %}
+                        <tr>
+                            <td>{{ item.entry_name }}</td>
+                            <td>
+                                {% if item.prediction_result == "Parkinson's Disease" %}
+                                    <span class="badge warning">{{ item.prediction_result }}</span>
+                                {% else %}
+                                    <span class="badge success">{{ item.prediction_result }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{% if item.probability %}{{ item.probability }}%{% else %}N/A{% endif %}</td>
+                            <td>{{ item.created_at }}</td>
+                            <td><a class="button-secondary" href="{% url 'history_detail' item.id %}">View Details</a></td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="padding: 1.2rem; color: var(--muted);">No prediction records available. Create a new prediction to populate the history.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    {% if error %}
+        <p class="disclaimer" style="color: var(--warning);">{{ error }}</p>
+    {% endif %}
+</div>
+{% endblock %}
